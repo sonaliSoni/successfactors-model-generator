@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:json="http://json.org/">
 <xsl:template match="/">
-    SONALI
     <xsl:for-each select=".//Property[not(@Type = preceding::Property/@Type)]"><xsl:value-of select="@Type" />, </xsl:for-each>
 {<xsl:for-each select="catalog/d/EntityType[@Name = 'User']">
 
@@ -16,15 +15,15 @@
     <xsl:variable name="nullable"><xsl:value-of select="./@Nullable"/></xsl:variable>
      "<xsl:value-of select="./@Name" />" : {
         "x-displayName": "<xsl:value-of select="./@label"/>",
-        "x-nullable": "<xsl:value-of select="$nullable" />",<xsl:choose><xsl:when test=" $dataType = 'Edm.Double'">
+        "x-nullable": <xsl:value-of select="$nullable"/>,<xsl:choose><xsl:when test=" $dataType = 'Edm.Double'">
         "format": "double",
         "type": "number"</xsl:when><xsl:when test=" $dataType = 'Edm.DateTime' or  $dataType = 'Edm.DateTimeOffset' or $dataType = 'Edm.Single' ">
         "format": "date-time",
         "type": "string",
-        "mask": "yyyy-MM-ddTHH:mm:ss"</xsl:when><xsl:when test="$dataType = 'Edm.DateTimeOffset'">
+        "mask": "milliseconds"</xsl:when><xsl:when test="$dataType = 'Edm.DateTimeOffset'">
             "format": "date-time",
             "type": "string",
-            "mask": "yyyy-MM-ddTHH:mm:ss+offset"</xsl:when><xsl:when test=" $dataType = 'Edm.String' or $dataType = 'Edm.Time' or $dataType = 'Edm.Byte'or $dataType = 'Edm.Binary'">
+            "mask": "milliseconds+offset"</xsl:when><xsl:when test=" $dataType = 'Edm.String' or $dataType = 'Edm.Time' or $dataType = 'Edm.Byte'or $dataType = 'Edm.Binary'">
         "type": "string"</xsl:when><xsl:when test=" $dataType = 'Edm.Boolean'">
         "type": "boolean"</xsl:when><xsl:when test=" $dataType = 'Edm.Int32'">
         "format": "int32",
@@ -63,15 +62,29 @@
       "<xsl:value-of select="./@ToRole"/>": {
         "id": "<xsl:value-of select="./@ToRole"/>",
         "properties": {
-        "uri": {
-        "type": "string"
-        }
+            "__deferred": {
+            "type": "<xsl:value-of select="./@ToRole"/>_deferred"
+            }
         }
         <xsl:choose> <xsl:when test="position() != last()">
             },</xsl:when> <xsl:otherwise>
             }
         </xsl:otherwise>
         </xsl:choose>
+        </xsl:if>
+    </xsl:for-each>
+
+    <xsl:for-each select="catalog/d/EntityType[@Name = 'User']/NavigationProperty">
+        <xsl:if test="not(@ToRole = preceding::NavigationProperty/@ToRole)">
+           ,"<xsl:value-of select="./@ToRole"/>_deferred": {
+            "id": "<xsl:value-of select="./@ToRole"/>_deferred",
+            "properties": {
+            "uri": {
+            "type": "string"
+            }
+            }
+          }
+
         </xsl:if>
     </xsl:for-each>
  }

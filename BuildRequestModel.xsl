@@ -12,9 +12,13 @@
                 <xsl:variable name="dataType"><xsl:value-of select="./@Type"/></xsl:variable>
                 <xsl:variable name="displayName"><xsl:value-of select="./@label"/></xsl:variable>
                 <xsl:variable name="nullable"><xsl:value-of select="./@Nullable"/></xsl:variable>
+                    <xsl:choose> <xsl:when test="(count(preceding-sibling::*) &gt; 1)">
+                        ,</xsl:when> <xsl:otherwise>
+                    </xsl:otherwise>
+                    </xsl:choose>
                 "<xsl:value-of select="./@Name" />" : {
                 "x-displayName": "<xsl:value-of select="./@label"/>",
-                "x-nullable": "<xsl:value-of select="$nullable" />",<xsl:choose><xsl:when test="$dataType = 'Edm.Double'">
+                "x-nullable": <xsl:value-of select="$nullable" />,<xsl:choose><xsl:when test="$dataType = 'Edm.Double'">
                     "format": "double",
                     "type": "number"</xsl:when><xsl:when test=" $dataType = 'Edm.DateTime' or  $dataType = 'Edm.DateTimeOffset' or $dataType = 'Edm.Single' ">
                     "format": "date-time",
@@ -31,56 +35,55 @@
                     "type": "integer"</xsl:when><xsl:when test=" $dataType = 'Edm.Decimal'">
                     "format": "double",
                     "type": "number"</xsl:when>
-                    <xsl:otherwise>"type": "Other"</xsl:otherwise></xsl:choose>
-                <xsl:choose> <xsl:when test="(count(following-sibling::*) &gt; 0)">
-                    },</xsl:when> <xsl:otherwise>
-                    }
-                </xsl:otherwise>
-                </xsl:choose>
+                    <xsl:otherwise>"type": "Other"</xsl:otherwise></xsl:choose>}
+
                 </xsl:if>
             </xsl:for-each>
 
-
+<!-- Handling all navigational properties -->
             <xsl:for-each select="./NavigationProperty">
-                <xsl:if test="@creatable = 'true'">
+               <xsl:if test="@creatable = 'true'">
                 <xsl:variable name="navDataType"><xsl:value-of select="./@FromRole"/></xsl:variable>
-                "<xsl:value-of select="./@Name" />" : {
+                <xsl:variable name="fieldName"><xsl:value-of select="./@Name"/></xsl:variable>
+                ,"<xsl:value-of select="./@Name" />" : {
                     <xsl:choose><xsl:when test=" $navDataType = 'user'">
-                        "type": "CreateUsers"</xsl:when>
-                    <xsl:otherwise>"type" : "<xsl:value-of select="$navDataType"/></xsl:otherwise>"</xsl:choose><xsl:choose> <xsl:when test="position() != last()">
-                },</xsl:when> <xsl:otherwise>
-                }
-            </xsl:otherwise>
-            </xsl:choose>
+                        "type": "<xsl:value-of select="$navDataType"/>-Rec"</xsl:when>
+                    <xsl:otherwise>"type" : "<xsl:value-of select="$navDataType"/>"</xsl:otherwise></xsl:choose>}
+
+
                 </xsl:if>
             </xsl:for-each>
             }
-            <xsl:choose> <xsl:when test="(count(./NavigationProperty)  &gt; 0)">
+            <xsl:choose> <xsl:when test="position() != last()">
                 },</xsl:when> <xsl:otherwise>
                 }
             </xsl:otherwise>
             </xsl:choose>
 
         </xsl:for-each>
+     <!--   <xsl:for-each select="catalog/d/EntityType[(@Name = 'User')]/NavigationProperty">
+        <xsl:if test="@creatable = 'true'">
+           <xsl:variable name="navDataType"><xsl:value-of select="./@FromRole"/></xsl:variable>
+            <xsl:variable name="fieldName"><xsl:value-of select="./@Name"/></xsl:variable>
+            <xsl:choose><xsl:when test=" $navDataType = 'user'">
+                ,"Rec<xsl:value-of select="$navDataType"/>" : {
+                "id" : "Rec<xsl:value-of select="$navDataType"/>",
+                "properties":{}}
 
-            <xsl:for-each select="catalog/d/EntityType[@Name = 'User']/NavigationProperty">
-                <xsl:if test="@creatable = 'true'">
-                <xsl:if test="not(@FromRole = preceding::NavigationProperty/@FromRole)">
-                    "<xsl:value-of select="./@FromRole"/>": {
-                    "id": "<xsl:value-of select="./@FromRole"/>",
-                    "properties": {
-                    "uri": {
-                    "type": "string"
-                    }
-                    }
-                    <xsl:choose> <xsl:when test="position() != last()">
-                        },</xsl:when> <xsl:otherwise>
-                        }
-                    </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:if>
-                </xsl:if>
-            </xsl:for-each>
+            </xsl:when><xsl:otherwise>
+
+             ,"<xsl:value-of select="$navDataType"/>" : {
+                "id" : "<xsl:value-of select="$navDataType"/>",
+                "properties":{
+                <xsl:variable name="currentEntityName"><xsl:value-of select=" ../@Name"/></xsl:variable>
+                <xsl:variable name="currentFromRole"><xsl:value-of select="./@FromRole"/></xsl:variable>
+                <xsl:for-each select="/catalog/d/EntityType[@Name =$currentEntityName]/NavigationProperty[(@FromRole =$currentFromRole)]">
+SONALI
+                </xsl:for-each>
+
+                </xsl:otherwise></xsl:choose>
+        </xsl:if>
+        </xsl:for-each> -->
             }
 
     </xsl:template>
