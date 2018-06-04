@@ -2,7 +2,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:json="http://json.org/">
 <xsl:template match="/">
     <xsl:for-each select=".//Property[not(@Type = preceding::Property/@Type)]"><xsl:value-of select="@Type" />, </xsl:for-each>
-{<xsl:for-each select="catalog/d/EntityType[@Name = 'User']">
+{<xsl:for-each select="catalog/d/EntityType[@Name = 'JobApplication']">
 
 "Get<xsl:value-of select="./@Name"/>sList": {
     "id": "Get<xsl:value-of select="./@Name"/>sList",
@@ -13,6 +13,7 @@
     <xsl:variable name="dataType"><xsl:value-of select="./@Type"/></xsl:variable>
     <xsl:variable name="displayName"><xsl:value-of select="./@label"/></xsl:variable>
     <xsl:variable name="nullable"><xsl:value-of select="./@Nullable"/></xsl:variable>
+
      "<xsl:value-of select="./@Name" />" : {
         "x-displayName": "<xsl:value-of select="./@label"/>",
         "x-nullable": <xsl:value-of select="$nullable"/>,<xsl:choose><xsl:when test=" $dataType = 'Edm.Double'">
@@ -57,7 +58,7 @@
     </xsl:choose>
 </xsl:for-each>
 
-    <xsl:for-each select="catalog/d/EntityType[@Name = 'User']/NavigationProperty">
+    <xsl:for-each select="catalog/d/EntityType[@Name = 'JobApplication']/NavigationProperty">
         <xsl:if test="not(@ToRole = preceding::NavigationProperty/@ToRole)">
       "<xsl:value-of select="./@ToRole"/>": {
         "id": "<xsl:value-of select="./@ToRole"/>",
@@ -74,7 +75,7 @@
         </xsl:if>
     </xsl:for-each>
 
-    <xsl:for-each select="catalog/d/EntityType[@Name = 'User']/NavigationProperty">
+    <xsl:for-each select="catalog/d/EntityType[@Name = 'JobApplication']/NavigationProperty">
         <xsl:if test="not(@ToRole = preceding::NavigationProperty/@ToRole)">
            ,"<xsl:value-of select="./@ToRole"/>_deferred": {
             "id": "<xsl:value-of select="./@ToRole"/>_deferred",
