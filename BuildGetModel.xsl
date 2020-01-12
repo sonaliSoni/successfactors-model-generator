@@ -15,7 +15,7 @@
     <xsl:variable name="nullable"><xsl:value-of select="./@Nullable"/></xsl:variable>
 
      "<xsl:value-of select="./@Name" />" : {
-        "x-displayName": "<xsl:value-of select="./@label"/>",
+        "x-displayNames": "<xsl:value-of select="./@label"/>",
         "x-nullable": <xsl:value-of select="$nullable"/>,<xsl:choose><xsl:when test=" $dataType = 'Edm.Double'">
         "format": "double",
         "type": "number"</xsl:when><xsl:when test=" $dataType = 'Edm.DateTime' or  $dataType = 'Edm.DateTimeOffset' or $dataType = 'Edm.Single' ">
